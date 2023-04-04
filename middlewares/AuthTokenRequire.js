@@ -9,7 +9,7 @@ module.exports = (req, res, next) => {
     if (!authorization) {
         return res.status(401).send({ error: "You must logged in" })
     }
-    const token = authorization.split(" ")[1];
+    const token = authorization.split("")[1];
     console.log("=======>",token);
     jwt.verify(token, process.env.jwt_secret, (err, payload) => {
         if (err) { 
