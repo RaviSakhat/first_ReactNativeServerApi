@@ -3,6 +3,8 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+
 
 //
 require('dotenv').config();
@@ -38,6 +40,37 @@ router.post('/signup', (req, res) => {
                 }
             }
         )
+})
+
+router.post('/signin', async (req, res) => {
+    const { userEmail, Password } = req.body;
+    if (!userEmail || !Password) {
+        return res.status(422).json({ error: "Please add email or password" });
+    }
+    const savedUser = await User.findOne({ userEmail })
+
+    if (!savedUser) {
+        return res.status(422).json({ error: "Invalid Credentials" });
+    }
+
+    try {
+        bcrypt.compare(Password, savedUser.Password, (err, result) => {
+            console.log('err',err)
+            console.log('result',result)
+            if (result) {
+                console.log("Password matched");
+                const token = jwt.sign({ _id: savedUser._id }, process.env.jwt_secret);
+                res.send({ token });
+            }
+            else {
+                console.log('Password does not match');
+                return res.status(422).json({ error: "Invalid Credentials" });
+            }
+        })
+    }
+    catch (err) {
+        console.log(err);
+    }
 })
 
 module.exports = router;

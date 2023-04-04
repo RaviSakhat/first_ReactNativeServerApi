@@ -14,8 +14,8 @@ app.use(bodyParser.json());
 app.use(authRoutes);
 
 app.get('/',requireToken,(req, res) => {
-    console.log(req.user)
-    res.send(req.user);
+    // console.log(req.user)
+    res.send("This is home page");
 });
 
 app.listen(port, () => {
