@@ -22,7 +22,7 @@ async function mailer(receiverEmail, code) {
         requireTLS: true,
         auth: {
             user: "codingbuggies@gmail.com", // generated ethereal user
-            pass: "pisxdgqblxblanaa", // generated ethereal password
+            pass: "pysojxdtlhtbtxmk", // generated ethereal password
         },
     });
 
@@ -43,35 +43,35 @@ async function mailer(receiverEmail, code) {
     // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
 }
 
-router.post('/verify', (req, res) => {
-    console.log(req.body);
-    const { userName, userEmail, Password, confirmPassword } = req.body;
-    if (!userName || !userEmail || !Password || !confirmPassword) {
-        return res.status(422).send({ error: "Please fill all the fields" });
-    }
-    User.findOne({ userEmail: userEmail })
-        .then(
-            async (savedUser) => {
-                if (savedUser) {
-                    return res.status(422).send({ error: "Invalid Credentials" });
-                }
-                try {
-                    let verificationCode = Math.floor(100000 + Math.random() * 900000)
-                    let user = [
-                        userName,
-                        userEmail,
-                        Password,
-                        confirmPassword,
-                        verificationCode
-                    ]
-                    await mailer(userEmail, verificationCode);
-                    res.send({ message: "Verification Code sent to your Email", userdata: user });
-                } catch (error) {
-                    console.log('error =======>', error)
-                }
-            }
-        )
-})
+// router.post('/verify', (req, res) => {
+//     console.log(req.body);
+//     const { userName, userEmail, Password, confirmPassword } = req.body;
+//     if (!userName || !userEmail || !Password || !confirmPassword) {
+//         return res.status(422).send({ error: "Please fill all the fields" });
+//     }
+//     User.findOne({ userEmail: userEmail })
+//         .then(
+//             async (savedUser) => {
+//                 if (savedUser) {
+//                     return res.status(422).send({ error: "Invalid Credentials" });
+//                 }
+//                 try {
+//                     let verificationCode = Math.floor(100000 + Math.random() * 900000)
+//                     let user = [
+//                         userName,
+//                         userEmail,
+//                         Password,
+//                         confirmPassword,
+//                         verificationCode
+//                     ]
+//                     await mailer(userEmail, verificationCode);
+//                     res.send({ message: "Verification Code sent to your Email", userdata: user });
+//                 } catch (error) {
+//                     console.log('error =======>', error)
+//                 }
+//             }
+//         )
+// })
 
 router.post('/signup', (req, res) => {
     // res.send("This is SignUp Page");
@@ -86,16 +86,19 @@ router.post('/signup', (req, res) => {
                 if (savedUser) {
                     return res.status(422).send({ error: "Invalid Credentials" });
                 }
+                let verificationCode = Math.floor(100000 + Math.random() * 900000);
                 const user = new User({
+                    verificationCode,
                     userName,
                     userEmail,
                     Password,
                     confirmPassword
-                })
+                }
+                )
                 try {
                     await user.save();
                     const token = jwt.sign({ _id: user._id }, process.env.jwt_secret);
-                    res.send({ token });
+                    res.send({token,  userdata: user });
                 } catch (err) {
                     console.log('err======>', err)
                     return res.status(422).send({ error: err.message })
