@@ -18,6 +18,10 @@ const userSchema = new mongoose.Schema({
     confirmPassword: {
         type: String,
         required: true,
+    },
+    verificationCode: {
+        type: String,
+        required: true,
     }
 })
 
